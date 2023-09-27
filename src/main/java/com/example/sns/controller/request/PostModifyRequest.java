@@ -2,14 +2,12 @@ package com.example.sns.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostCreateRequest {
+public class PostModifyRequest {
     private String title;
     private String body;
 }

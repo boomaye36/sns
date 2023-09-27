@@ -16,7 +16,9 @@ public class Response<T> {
     public static <T> Response<T> success(T result){
         return new Response<>("success", result);
     }
-
+    public static Response<Void> success(){
+        return new Response<>("success", null);
+    }
     public String toStream() {
         if (result == null) {
             return "{" +
