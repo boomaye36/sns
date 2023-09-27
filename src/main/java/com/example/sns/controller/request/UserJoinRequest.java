@@ -6,7 +6,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 public class UserJoinRequest {
-    private String userName;
+    private String name;
     private String password;
 
     public UserJoinRequest() {
