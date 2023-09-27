@@ -1,5 +1,6 @@
 package com.example.sns.service;
 
+import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.SnsApplicationException;
 import com.example.sns.fixture.UserEntityFixture;
 import com.example.sns.model.entity.UserEntity;
@@ -35,9 +36,9 @@ public class UserServiceTest {
         String userName = "userName";
         String password = "password";
 
-        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.empty());
+       when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.empty());
         when(encoder.encode(password)).thenReturn("encrypt_password");
-        when(userEntityRepository.save(any())).thenReturn(Optional.of(UserEntityFixture.get(userName, password)));
+        when(userEntityRepository.save(any())).thenReturn(UserEntityFixture.get(userName, password));
         Assertions.assertDoesNotThrow(() -> userService.join(userName, password));
     }
 
@@ -51,7 +52,8 @@ public class UserServiceTest {
         when(encoder.encode(password)).thenReturn("encrypt_password");
         when(userEntityRepository.save(any())).thenReturn(Optional.of(fixture));
 
-        Assertions.assertThrows(SnsApplicationException.class, () -> userService.join(userName, password));
+        SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () -> userService.join(userName, password));
+        Assertions.assertEquals(ErrorCode.DUPLICATED_USER_NAME, e.getErrorCode());
     }
 
     @Test
@@ -86,4 +88,6 @@ public class UserServiceTest {
 
         Assertions.assertThrows(SnsApplicationException.class, () -> userService.login(userName, wrongPassword));
     }
+
+
 }
