@@ -2,10 +2,13 @@ package com.example.sns.service;
 
 import com.example.sns.exception.ErrorCode;
 import com.example.sns.exception.SnsApplicationException;
+import com.example.sns.model.Comment;
 import com.example.sns.model.Post;
+import com.example.sns.model.entity.CommentEntity;
 import com.example.sns.model.entity.LikeEntity;
 import com.example.sns.model.entity.PostEntity;
 import com.example.sns.model.entity.UserEntity;
+import com.example.sns.repository.CommentEntityRepository;
 import com.example.sns.repository.LikeEntityRepository;
 import com.example.sns.repository.PostEntityRepository;
 import com.example.sns.repository.UserEntityRepository;
@@ -21,6 +24,8 @@ public class PostService {
     private final PostEntityRepository postEntityRepository;
     private final UserEntityRepository userEntityRepository;
     private final LikeEntityRepository likeEntityRepository;
+    private final CommentEntityRepository commentEntityRepository;
+
     @Transactional
     public void create(String title, String body, String userName){
         //user find
@@ -104,4 +109,38 @@ public class PostService {
        return likeCnt;
     }
 
+    @Transactional
+    public void createComment(String comment, Integer postId, String userName){
+        UserEntity userEntity = userEntityRepository.findByUserName(userName).orElseThrow(() ->
+                new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
+
+        PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() ->
+                new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not found", postId)));
+        commentEntityRepository.save(CommentEntity.of(comment, postEntity, userEntity));
+
+    }
+
+    @Transactional
+    public void createReply(String comment, Integer parentId, Integer postId, String userName){
+        UserEntity userEntity = userEntityRepository.findByUserName(userName).orElseThrow(() ->
+                new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not found", userName)));
+
+        PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() ->
+                new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not found", postId)));
+
+            CommentEntity parentComment = commentEntityRepository.findById(parentId)
+                    .orElseThrow(() -> new SnsApplicationException(ErrorCode.COMMENT_NOT_FOUND));
+            CommentEntity replyComment = CommentEntity.of(comment, postEntity, userEntity);
+            replyComment.setParentComment(parentComment);
+            commentEntityRepository.save(replyComment);
+
+    }
+
+    public Page<Comment> getComment(Integer postId, Pageable pageable) {
+        PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() ->
+                new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not found", postId)));
+//        Page<Comment> comments = commentEntityRepository.findAllByPostId(postId, pageable).map(Comment::fromEntity);
+//        System.out.println(comments.stream().map(Comment::getComment));
+        return commentEntityRepository.findAllByPost(postEntity, pageable).map(Comment::fromEntity);
+    }
 }
