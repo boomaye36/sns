@@ -22,6 +22,7 @@ public class PostService {
     private final LikeEntityRepository likeEntityRepository;
     private final CommentEntityRepository commentEntityRepository;
     private final AlarmEntityRepository alarmEntityRepository;
+    private final AlarmService alarmService;
 
     @Transactional
     public void create(String title, String body, String userName){
@@ -93,8 +94,9 @@ public class PostService {
 
         // like save
         likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
-        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_LIKE_ON_POST,
+        AlarmEntity alarmEntity = alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_LIKE_ON_POST,
                 new AlarmArgument(userEntity.getId(), postEntity.getId()))); // post를 작성한 사람에게 알람전송
+        alarmService.send(alarmEntity.getId(), postEntity.getUser().getId()); // sse 알람전송
     }
 
     public Integer likeCnt(Integer postId) {
@@ -116,8 +118,9 @@ public class PostService {
         PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() ->
                 new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not found", postId)));
         commentEntityRepository.save(CommentEntity.of(comment, postEntity, userEntity));
-        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_COMMENT_ON_POST,
+        AlarmEntity alarmEntity = alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_COMMENT_ON_POST,
                 new AlarmArgument(userEntity.getId(), postEntity.getId()))); // post를 작성한 사람에게 알람전송
+        alarmService.send(alarmEntity.getId(), postEntity.getUser().getId());
     }
 
     @Transactional

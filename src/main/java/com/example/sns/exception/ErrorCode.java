@@ -14,7 +14,8 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "post not found"),
     INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "permission invalid"),
     ALREADY_LIKED(HttpStatus.CONFLICT, "user already liked post"),
-    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "comment not found");
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "comment not found"),
+    ALARM_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connecting alarm occur error");
     private HttpStatus status;
     private String message;
 }

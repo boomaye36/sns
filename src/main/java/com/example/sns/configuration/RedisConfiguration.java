@@ -28,9 +28,9 @@
 //        return factory;
 //    }
 //    @Bean
-//    public RedisTemplate<String, User> userRedisTemplate(){
+//    public RedisTemplate<String, User> userRedisTemplate(RedisConnectionFactory redisConnectionFactory){
 //        RedisTemplate<String, User> redisTemplate = new RedisTemplate<>();
-//        redisTemplate.setConnectionFactory();
+//        redisTemplate.setConnectionFactory(redisConnectionFactory);
 //        redisTemplate.setKeySerializer(new StringRedisSerializer());
 //        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<User>(User.class));
 //        return redisTemplate;
